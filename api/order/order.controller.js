@@ -33,11 +33,11 @@ export async function updateOrder(req, res) {
 		res.status(403).send('Not your order...')
 		return
 	}
-
-
-
 	try {
 		const updatedOrder = await orderService.update(order)
+		console.log('order.buyer._id :', order.buyer._id)
+		socketService.emitToUser({ type: 'order-status-updated', data: order, userId: order.buyer._id })
+
 		res.json(updatedOrder)
 	} catch (err) {
 		logger.error('Failed to update order', err)
@@ -94,9 +94,8 @@ export async function addOrder(req, res) {
 		// delete order.aboutUser.givenOrders
 		// delete order.aboutUserId
 		// delete order.byUserId
-
-		// socketService.broadcast({ type: 'order-added', data: order, userId: loggedinUser._id })
-		// socketService.emitToUser({ type: 'order-about-you', data: order, userId: order.aboutUser._id })
+		socketService.emitToUser({ type: 'order-added', data: order, userId: order.seller._id })
+		socketService.emitToUser({ type: 'order-about-you', data: order, userId: order.seller._id })
 
 		// const fullUser = await userService.getById(loggedinUser._id)
 		// socketService.emitTo({ type: 'user-updated', data: fullUser, label: fullUser._id })
