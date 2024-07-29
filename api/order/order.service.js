@@ -91,6 +91,11 @@ async function update(order) {
     try {
         const criteria = { _id: ObjectId.createFromHexString(order._id) }
         const collection = await dbService.getCollection('order')
+
+        orderToSave.seller._id = ObjectId.createFromHexString(order.seller._id)
+        orderToSave.buyer._id = ObjectId.createFromHexString(order.buyer._id)
+        orderToSave.gig._id = ObjectId.createFromHexString(order.gig._id)
+
         await collection.updateOne(criteria, { $set: orderToSave })
 
         return order
