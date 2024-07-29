@@ -23,12 +23,17 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('public')))
 } else {
     const corsOptions = {
-        origin: ['http://127.0.0.1:3000',
+        origin: [
+            'http://127.0.0.1:3000',
             'http://localhost:3000',
             'http://127.0.0.1:5173',
             'http://localhost:5173'
         ],
-        credentials: true
+        credentials: true,
+        // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        // allowedHeaders: ['Content-Type', 'Authorization'],
+        // preflightContinue: true,
+
     }
     app.use(cors(corsOptions))
 }
@@ -38,6 +43,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/review', reviewRoutes)
 app.use('/api/gig', gigRoutes)
+app.use('/api/order', orderRoutes)
 
 setupSocketAPI(server)
 
@@ -51,6 +57,7 @@ app.get('/**', (req, res) => {
 })
 
 import { logger } from './services/logger.service.js'
+import { orderRoutes } from './api/order/order.routes.js'
 const port = process.env.PORT || 3030
 
 server.listen(port, () => {

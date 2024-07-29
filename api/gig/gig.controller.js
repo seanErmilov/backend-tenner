@@ -4,10 +4,11 @@ import { gigService } from './gig.service.js'
 export async function getGigs(req, res) {
 	try {
 		const filterBy = {
-			txt: req.query.txt || '',
-			minSpeed: +req.query.minSpeed || 0,
-			sortField: req.query.sortField || '',
-			sortDir: req.query.sortDir || 1,
+			title: req.query.title || '',
+			price: +req.query.price || 0,
+			daysToMake: +req.query.daysToMake || 0,
+			descrption: req.query.descrption || '',
+			tags: req.query.tags || [],
 			pageIdx: req.query.pageIdx,
 		}
 		const gigs = await gigService.query(filterBy)

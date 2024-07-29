@@ -17,7 +17,7 @@ export const gigService = {
 	removeGigMsg,
 }
 
-async function query(filterBy = { txt: '' }) {
+async function query(filterBy) {
 	try {
 		const criteria = _buildCriteria(filterBy)
 		const sort = _buildSort(filterBy)
@@ -28,7 +28,6 @@ async function query(filterBy = { txt: '' }) {
 		if (filterBy.pageIdx !== undefined) {
 			gigCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
 		}
-
 		const gigs = gigCursor.toArray()
 		return gigs
 	} catch (err) {
@@ -86,7 +85,7 @@ async function add(gig) {
 }
 
 async function update(gig) {
-	const gigToSave = { vendor: gig.vendor, speed: gig.speed }
+	const gigToSave = { title: gig.title, speed: gig.speed }
 
 	try {
 		const criteria = { _id: ObjectId.createFromHexString(gig._id) }
@@ -131,9 +130,26 @@ async function removeGigMsg(gigId, msgId) {
 }
 
 function _buildCriteria(filterBy) {
-	const criteria = {
-		vendor: { $regex: filterBy.txt, $options: 'i' },
-		speed: { $gte: filterBy.minSpeed },
+	const criteria = {}
+
+	if (filterBy.title) {
+		criteria.title = { $regex: filterBy.title, $options: 'i' }
+	}
+
+	if (filterBy.descrption) {
+		criteria.descrption = { $regex: filterBy.descrption, $options: 'i' }
+	}
+
+	if (filterBy.price !== undefined && filterBy.price !== null) {
+		criteria.price = { $gte: filterBy.price }
+	}
+
+	if (filterBy.daysToMake !== undefined && filterBy.daysToMake !== null) {
+		criteria.daysToMake = { $gte: filterBy.daysToMake }
+	}
+
+	if (filterBy.tags && filterBy.tags.length > 0) {
+		criteria.tags = { $in: filterBy.tags }
 	}
 
 	return criteria
