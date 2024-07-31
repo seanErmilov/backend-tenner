@@ -141,11 +141,12 @@ function _buildCriteria(filterBy) {
 	}
 
 	if (filterBy.price !== undefined && filterBy.price !== null) {
-		criteria.price = { $gte: filterBy.price }
+		criteria.price = { $lte: filterBy.price }
 	}
 
 	if (filterBy.daysToMake !== undefined && filterBy.daysToMake !== null) {
-		criteria.daysToMake = { $gte: filterBy.daysToMake }
+		console.log('filterBy.daysToMake :', filterBy.daysToMake)
+		criteria.daysToMake = { $lte: filterBy.daysToMake }
 	}
 
 	if (filterBy.tags && filterBy.tags.length > 0) {
