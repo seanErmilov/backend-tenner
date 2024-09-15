@@ -16,12 +16,12 @@ export async function getReviews(req, res) {
 
 export async function deleteReview(req, res) {
 	var { loggedinUser } = req
-    const { id: reviewId } = req.params
-    
+	const { id: reviewId } = req.params
+
 	try {
 		const deletedCount = await reviewService.remove(reviewId)
 		if (deletedCount === 1) {
-            socketService.broadcast({ type: 'review-removed', data: reviewId, userId: loggedinUser._id })
+			socketService.broadcast({ type: 'review-removed', data: reviewId, userId: loggedinUser._id })
 			res.send({ msg: 'Deleted successfully' })
 		} else {
 			res.status(400).send({ err: 'Cannot remove review' })
@@ -41,11 +41,7 @@ export async function addReview(req, res) {
 		review.byUserId = loggedinUser._id
 		review = await reviewService.add(review)
 
-		// Give the user credit for adding a review
-		// var user = await userService.getById(review.byUserId)
-		// user.score += 10
 
-		loggedinUser.score += 10
 		await userService.update(loggedinUser)
 
 		// Update user score in login token as well
