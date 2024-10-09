@@ -6,8 +6,10 @@ import { messageservice } from './message.service.js'
 
 export async function getMessages(req, res) {
 	try {
-		console.log('req.loggedinUser :', req.loggedinUser)
-		const messages = await messageservice.query(req.query)
+		const filterBy = {
+			_userId: req.loggedinUser._id
+		}
+		const messages = await messageservice.query(filterBy)
 		res.send(messages)
 	} catch (err) {
 		logger.error('Cannot get messages', err)
@@ -36,7 +38,6 @@ export async function updateMessage(req, res) {
 	}
 	try {
 		const updatedMessage = await messageservice.update(message)
-		console.log('message.buyer._id :', message.buyer._id)
 		socketService.emitToUser({ type: 'message-status-updated', data: message, userId: message.buyer._id })
 
 		res.json(updatedMessage)
@@ -69,12 +70,11 @@ export async function addMessage(req, res) {
 
 	try {
 		var message = req.body
-		const { aboutUserId } = message
-		console.log('loggedinUser :', loggedinUser)
-		message.buyer = { ...loggedinUser }
+		if (message.senderId !== loggedinUser._id) throw "User"
+		message.senderId = loggedinUser._id
 		message = await messageservice.add(message)
 
-		// socketService.emitToUser({ type: 'message-added', data: message, userId: message.seller._id })
+		socketService.emitToUser({ type: 'message-added', data: message, userId: message.seller._id })
 		// socketService.emitToUser({ type: 'message-about-you', data: message, userId: message.seller._id })
 		res.send(message)
 	} catch (err) {

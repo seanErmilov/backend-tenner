@@ -55,24 +55,12 @@ async function remove(messageId) {
 
 async function add(message) {
     try {
+        console.log('message :', message)
         const messageToAdd = {
-            seller: {
-                _id: ObjectId.createFromHexString(message.seller._id),
-                imgUrl: message.seller.imgUrl,
-                fullName: message.seller.fullname,
-            },
-            gig: {
-                _id: ObjectId.createFromHexString(message.gig._id),
-                name: message.gig.name,
-                imgUrl: message.gig.imgUrl,
-                price: message.gig.price,
-            },
-            buyer: {
-                _id: ObjectId.createFromHexString(message.buyer._id),
-                imgUrl: message.buyer.imgUrl,
-                fullName: message.buyer.fullname,
-            },
-            status: message.status,
+            senderId: message.senderId,
+            recipientId: message.recipientId,
+            content: message.content,
+            attachments: message.attachments,
         }
         const collection = await dbService.getCollection('message')
         await collection.insertOne(messageToAdd)
@@ -105,9 +93,12 @@ async function update(message) {
 
 function _buildCriteria(filterBy) {
     const criteria = {}
-
     if (filterBy._userId) {
-        criteria['seller._id'] = ObjectId.createFromHexString(filterBy._userId)
+        // const userId = ObjectId.createFromHexString(filterBy._userId)
+        criteria['$or'] = [
+            { senderId: filterBy._userId },
+            { recipientId: filterBy._userId }
+        ]
     }
     return criteria
 }
