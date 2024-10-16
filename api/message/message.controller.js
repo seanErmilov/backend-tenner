@@ -70,8 +70,8 @@ export async function addMessage(req, res) {
 
 	try {
 		var message = req.body
-		if (message.senderId !== loggedinUser._id) throw "User"
-		message.senderId = loggedinUser._id
+		if (message.sender._id !== loggedinUser._id) throw "User"
+		message.sender._id = loggedinUser._id
 		message = await messageservice.add(message)
 
 		// socketService.emitToUser({ type: 'message-added', data: message, userId: message.seller._id })

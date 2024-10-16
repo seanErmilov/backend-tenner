@@ -11,6 +11,7 @@ async function query(filterBy = {}) {
         const criteria = _buildCriteria(filterBy)
         const collection = await dbService.getCollection('message')
         const messages = await collection.find(criteria).sort({ "_id": -1 }).toArray()
+        console.log('messages :', messages)
         return messages
     } catch (err) {
         logger.error('cannot get messages', err)
@@ -54,20 +55,31 @@ async function remove(messageId) {
 
 async function add(message) {
     try {
-        console.log('message :', message)
-        const messageToAdd = {
-            senderId: message.senderId,
-            recipientId: message.recipientId,
-            content: message.content,
-            attachments: message.attachments,
-        }
-        const collection = await dbService.getCollection('message')
-        await collection.insertOne(messageToAdd)
+        console.log('message :', message);
 
-        return messageToAdd
+        const messageToAdd = {
+            sender: {
+                _id: message.sender._id,
+                imgUrl: message.sender.imgUrl,
+                fullname: message.sender.fullname
+            },
+            recipient: {
+                _id: message.recipient._id,
+                imgUrl: message.recipient.imgUrl,
+                fullname: message.recipient.fullname
+            },
+            content: message.content,
+            messageType: message.messageType || '',
+            attachments: message.attachments || []
+        };
+
+        const collection = await dbService.getCollection('message');
+        await collection.insertOne(messageToAdd);
+
+        return messageToAdd;
     } catch (err) {
-        logger.error('cannot add message', err)
-        throw err
+        logger.error('cannot add message', err);
+        throw err;
     }
 }
 
@@ -95,8 +107,8 @@ function _buildCriteria(filterBy) {
     if (filterBy._userId) {
         // const userId = ObjectId.createFromHexString(filterBy._userId)
         criteria['$or'] = [
-            { senderId: filterBy._userId },
-            { recipientId: filterBy._userId }
+            { 'sender._id': filterBy._userId },
+            { 'recipient._id': filterBy._userId }
         ]
     }
     return criteria
