@@ -6,9 +6,12 @@ import { messageservice } from './message.service.js'
 
 export async function getMessages(req, res) {
 	try {
+		console.log('req :', req.query)
 		const filterBy = {
-			_userId: req.loggedinUser._id
+			_userId: req.loggedinUser._id,
+			chatPartnerId: req.query.chatPartnerId
 		}
+		console.log('filterBy :', filterBy)
 		const messages = await messageservice.query(filterBy)
 		res.send(messages)
 	} catch (err) {

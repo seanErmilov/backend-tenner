@@ -11,7 +11,6 @@ async function query(filterBy = {}) {
         const criteria = _buildCriteria(filterBy)
         const collection = await dbService.getCollection('message')
         const messages = await collection.find(criteria).sort({ "_id": -1 }).toArray()
-        console.log('messages :', messages)
         return messages
     } catch (err) {
         logger.error('cannot get messages', err)
@@ -104,12 +103,12 @@ async function update(message) {
 
 function _buildCriteria(filterBy) {
     const criteria = {}
-    if (filterBy._userId) {
-        // const userId = ObjectId.createFromHexString(filterBy._userId)
+    if (filterBy._userId && filterBy.chatPartnerId) {
         criteria['$or'] = [
-            { 'sender._id': filterBy._userId },
-            { 'recipient._id': filterBy._userId }
+            { 'sender._id': filterBy._userId, 'recipient._id': filterBy.chatPartnerId },
+            { 'sender._id': filterBy.chatPartnerId, 'recipient._id': filterBy._userId }
         ]
     }
     return criteria
 }
+
