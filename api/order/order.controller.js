@@ -73,32 +73,8 @@ export async function addOrder(req, res) {
 		order.buyer = { ...loggedinUser }
 		order = await orderService.add(order)
 
-		// Give the user credit for adding a order
-		// var user = await userService.getById(order.byUserId)
-		// user.score += 10
-
-		// loggedinUser.score += 10
-		// await userService.update(loggedinUser)
-
-		// Update user score in login token as well
-
-		// const loginToken = authService.getLoginToken(loggedinUser)
-		// res.cookie('loginToken', loginToken)
-
-		// prepare the updated order for sending out
-
-
-		// order.byUser = loggedinUser
-		// order.aboutUser = await userService.getById(aboutUserId)
-
-		// delete order.aboutUser.givenOrders
-		// delete order.aboutUserId
-		// delete order.byUserId
 		socketService.emitToUser({ type: 'order-added', data: order, userId: order.seller._id })
 		socketService.emitToUser({ type: 'order-about-you', data: order, userId: order.seller._id })
-
-		// const fullUser = await userService.getById(loggedinUser._id)
-		// socketService.emitTo({ type: 'user-updated', data: fullUser, label: fullUser._id })
 		res.send(order)
 	} catch (err) {
 		logger.error('Failed to add order', err)
